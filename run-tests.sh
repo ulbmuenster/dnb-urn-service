@@ -12,6 +12,11 @@
 # Quit on errors
 set -o errexit
 
+if [ -z "${DNB_URN_USER}" ] || [ -z "${DNB_URN_PW}" ] || [ -z "${DNB_URN_PREFIX}" ]; then
+  echo "DNB_URN_USER, DNB_URN_PW or DNB_URN_PREFIX env var not set"
+  exit 1
+fi
+
 # Quit on unbound symbols
 set -o nounset
 

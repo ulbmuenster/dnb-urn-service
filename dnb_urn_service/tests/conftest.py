@@ -8,13 +8,6 @@
 # under the terms of the Revised BSD License; see LICENSE file for
 # more details.
 
-"""Tests for /urns/urn POST."""
+"""Pytest configuration."""
 
 import pytest
-import responses
-from helpers import get_client
-
-
-@responses.activate
-def test_urn_post_200():
-    assert True is True

@@ -72,6 +72,7 @@ class DNBUrnServiceRESTClient(object):
         """
         request = self._create_request()
         resp = request.get("urns/urn/" + urn + "/my-urls")
+        print(resp.status_code)
         if resp.status_code == HTTP_OK:
             return resp.json()['items'][0]['url']
         else:

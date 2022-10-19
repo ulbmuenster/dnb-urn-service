@@ -10,6 +10,8 @@
 
 """Test helpers."""
 
+import os
+
 from dnb_urn_service import DNBUrnServiceRESTClient
 
 
@@ -22,3 +24,11 @@ def get_client(username="DNB", password="pw", prefix="urn:nbn:"):
         test_mode=True,
     )
     return client
+
+
+def get_credentials():
+    """Get credentials from environment."""
+    username = os.environ["DNB_URN_USER"]
+    password = os.environ["DNB_URN_PW"]
+    prefix = os.environ["DNB_URN_PREFIX"]
+    return username, password, prefix

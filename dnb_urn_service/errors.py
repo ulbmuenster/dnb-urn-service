@@ -21,11 +21,28 @@ class DNBURNServiceError(Exception):
     @staticmethod
     def factory(err_code, *args):
         """Create exceptions through a Factory based on the HTTP error code."""
-        return DNBURNServiceServerError
+        if err_code == 404:
+            return DNBURNServiceUrnNotRegisteredError
+        else:
+            return DNBURNServiceServerError
 
 
 class DNBURNServiceServerError(DNBURNServiceError):
     """An internal server error happened on the DNB end. Try later.
 
     Base class for all 5XX-related HTTP error codes.
+    """
+
+
+class DNBURNServiceUserNotAuthenticatedError(DNBURNServiceError):
+    """The user is not authenticated.
+
+    Base class for 401-related HTTP error code.
+    """
+
+
+class DNBURNServiceUrnNotRegisteredError(DNBURNServiceError):
+    """The requested URN is not registered.
+
+    Base class for 404-related HTTP error code.
     """
