@@ -8,10 +8,13 @@
 # under the terms of the Revised BSD License; see LICENSE file for
 # more details.
 
+"""Tests for /urns/urn POST."""
 
-"""Python API wrapper for the DNB URN service API."""
+import pytest
+import responses
+from helpers import get_client
 
-from .rest_client import DNBUrnServiceRESTClient
-from .version import __version__
 
-__all__ = ('DNBUrnServiceRESTClient', '__version__')
+@responses.activate
+def test_urn_post_200():
+    assert True is True

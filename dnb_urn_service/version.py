@@ -8,8 +8,8 @@
 # under the terms of the Revised BSD License; see LICENSE file for
 # more details.
 
-"""
-Version information for dnb_urn_service package.
+"""Version information for dnb_urn_service package.
+
 This file is imported by ``dnb_urn_service.__init__``, and parsed by
 ``setup.py`` as well as ``docs/conf.py``.
 """
