@@ -14,6 +14,7 @@ API documentation is available at
 https://wiki.dnb.de/display/URNSERVDOK/URN-Service+API.
 """
 
+import json
 import requests
 
 from .errors import DNBURNServiceError
@@ -77,3 +78,32 @@ class DNBUrnServiceRESTClient(object):
             return resp.json()['items'][0]['url']
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
+
+
+    def post_urn(self, data):
+        """Post a new JSON payload to DataCite."""
+        headers = {'content-type': 'application/vnd.api+json'}
+        body = {"data": data}
+        request = self._create_request()
+        resp = request.post("dois", body=json.dumps(body), headers=headers)
+        if resp.status_code == HTTP_CREATED:
+            return resp.json()['data']['id']
+        else:
+            raise DNBURNServiceError.factory(resp.status_code, resp.text)
+
+
+    def create_urn(self, url, urn):
+        """Create an urn.
+
+        This URN will be public and can be deleted.
+        If urn is not provided, there will be an error.
+        :param url: URL where the urn will resolve.
+        :param urn: URN (e.g. urn:nbn:de:hbz:6-1234)
+        :return:
+        """
+        data = {"attributes": "metadata"}
+        data["attributes"]["prefix"] = self.prefix
+        data["attributes"]["event"] = "publish"
+        data["attributes"]["url"] = url
+
+        return self.post_urn(data)
