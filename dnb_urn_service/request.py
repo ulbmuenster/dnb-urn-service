@@ -77,6 +77,8 @@ class DNBUrnServiceRequest(object):
             kwargs['data'] = body
         if method == 'PUT':
             kwargs['data'] = body
+        if method == 'PATCH':
+            kwargs['data'] = body
         if self.timeout is not None:
             kwargs['timeout'] = self.timeout
 
@@ -94,4 +96,9 @@ class DNBUrnServiceRequest(object):
     def post(self, url, body=None, params=None, headers=None):
         """Make a POST request."""
         return self.request(url, method="POST", body=body, params=params,
+                            headers=headers)
+
+    def patch(self, url, body=None, params=None, headers=None):
+        """Make a POST request."""
+        return self.request(url, method="PATCH", body=body, params=params,
                             headers=headers)

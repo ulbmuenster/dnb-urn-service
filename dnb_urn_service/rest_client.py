@@ -22,6 +22,7 @@ from .request import DNBUrnServiceRequest
 
 HTTP_OK = requests.codes['ok']
 HTTP_CREATED = requests.codes['created']
+HTTP_NO_CONTENT = requests.codes['no_content']
 
 
 class DNBUrnServiceRESTClient(object):
@@ -73,37 +74,55 @@ class DNBUrnServiceRESTClient(object):
         """
         request = self._create_request()
         resp = request.get("urns/urn/" + urn + "/my-urls")
-        print(resp.status_code)
         if resp.status_code == HTTP_OK:
             return resp.json()['items'][0]['url']
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
-
-    def post_urn(self, data):
-        """Post a new JSON payload to DataCite."""
-        headers = {'content-type': 'application/vnd.api+json'}
-        body = {"data": data}
+    def post_urn(self, urn, data):
+        """Post a new JSON payload to DNB."""
+        headers = {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+        }
+        body = data
         request = self._create_request()
-        resp = request.post("dois", body=json.dumps(body), headers=headers)
+        resp = request.post("urns/urn/" + urn + "/urls", body=json.dumps(body), headers=headers)
         if resp.status_code == HTTP_CREATED:
-            return resp.json()['data']['id']
+            return resp.json()['urn']
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
+    def patch_urn(self, urn, data):
+        """Patch a new JSON payload to DNB."""
+        headers = {"content-type": "application/json"}
+        body = data
+        request = self._create_request()
+        resp = request.patch("urns/urn/" + urn, body=json.dumps(body), headers=headers)
+        if resp.status_code == HTTP_NO_CONTENT:
+            return ""
+        else:
+            raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
-    def create_urn(self, url, urn):
+    def create_urn(self, url, urn, owner):
         """Create an urn.
 
         This URN will be public and can be deleted.
         If urn is not provided, there will be an error.
         :param url: URL where the urn will resolve.
         :param urn: URN (e.g. urn:nbn:de:hbz:6-1234)
+        :param owner: ID of the owning organisation, obtained from DNB
         :return:
         """
-        data = {"attributes": "metadata"}
-        data["attributes"]["prefix"] = self.prefix
-        data["attributes"]["event"] = "publish"
-        data["attributes"]["url"] = url
+        data = {
+            "url": url,
+            "owner": self.api_url + "organisations/id/" + owner,
+            "priority": 10
+        }
 
-        return self.post_urn(data)
+        return self.post_urn(urn, data)
+
+    def create_successor(self, urn, successor):
+        data = {"successor": self.api_url + "urns/urn/" + successor}
+
+        return self.patch_urn(urn, data)
