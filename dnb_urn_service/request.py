@@ -98,6 +98,14 @@ class DNBUrnServiceRequest(object):
         return self.request(url, method="POST", body=body, params=params,
                             headers=headers)
 
+    def delete(self, url):
+        """Make a DELETE request."""
+        return self.request(url, method="DELETE")
+
+    def head(self, url):
+        """Make a HEAD request."""
+        return self.request(url, method="HEAD")
+
     def patch(self, url, body=None, params=None, headers=None):
         """Make a POST request."""
         return self.request(url, method="PATCH", body=body, params=params,

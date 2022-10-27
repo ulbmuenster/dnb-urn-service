@@ -12,8 +12,8 @@
 # Quit on errors
 set -o errexit
 
-if [ -z "${DNB_URN_USER}" ] || [ -z "${DNB_URN_PW}" ] || [ -z "${DNB_URN_PREFIX}" ]; then
-  echo "DNB_URN_USER, DNB_URN_PW or DNB_URN_PREFIX env var not set"
+if [ -z "${DNB_URN_USER}" ] || [ -z "${DNB_URN_PW}" ] || [ -z "${DNB_URN_PREFIX}" ] || [ -z "${DNB_URN_ORGANISATION_ID}" ]; then
+  echo "DNB_URN_USER, DNB_URN_PW, DNB_URN_PREFIX or DNB_URN_ORGANISATION_ID env var not set"
   exit 1
 fi
 

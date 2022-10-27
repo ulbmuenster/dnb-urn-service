@@ -20,6 +20,7 @@ history = open('CHANGES.rst').read()
 tests_require = [
     'responses>=0.10.6',
     'mock>=1.3.0',
+    'pytest>=7.1.3',
     'pytest-invenio>=1.4.0',
 ]
 

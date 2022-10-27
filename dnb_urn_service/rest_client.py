@@ -15,9 +15,10 @@ https://wiki.dnb.de/display/URNSERVDOK/URN-Service+API.
 """
 
 import json
+
 import requests
 
-from .errors import DNBURNServiceError
+from .errors import DNBURNServiceError, DNBURNServiceUserNotAuthorizedError
 from .request import DNBUrnServiceRequest
 
 HTTP_OK = requests.codes['ok']
@@ -79,7 +80,19 @@ class DNBUrnServiceRESTClient(object):
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
-    def post_urn(self, urn, data):
+    def head_urn(self, urn):
+        """Check if a URN is registered.
+
+        :param urn: URN name of the resource.
+        """
+        request = self._create_request()
+        resp = request.head("urns/urn/" + urn)
+        if resp.status_code == HTTP_OK:
+            return ""
+        else:
+            raise DNBURNServiceError.factory(resp.status_code, resp.text)
+
+    def post_urn(self, data):
         """Post a new JSON payload to DNB."""
         headers = {
             'content-type': 'application/json',
@@ -87,7 +100,10 @@ class DNBUrnServiceRESTClient(object):
         }
         body = data
         request = self._create_request()
-        resp = request.post("urns/urn/" + urn + "/urls", body=json.dumps(body), headers=headers)
+        resp = request.post(
+            "urns",
+            body=json.dumps(body),
+            headers=headers)
         if resp.status_code == HTTP_CREATED:
             return resp.json()['urn']
         else:
@@ -98,13 +114,24 @@ class DNBUrnServiceRESTClient(object):
         headers = {"content-type": "application/json"}
         body = data
         request = self._create_request()
-        resp = request.patch("urns/urn/" + urn, body=json.dumps(body), headers=headers)
+        resp = request.patch(
+            "urns/urn/" + urn,
+            body=json.dumps(body),
+            headers=headers)
         if resp.status_code == HTTP_NO_CONTENT:
             return ""
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
-    def create_urn(self, url, urn, owner):
+    def delete_urn(self, urn):
+        """Delete a URN completely.
+
+        As this action is only allowed for system administrators
+        directly raise a DNBURNServiceUserNotAuthorizedError
+        """
+        raise DNBURNServiceUserNotAuthorizedError
+
+    def create_urn(self, url, urn):
         """Create an urn.
 
         This URN will be public and can be deleted.
@@ -115,14 +142,22 @@ class DNBUrnServiceRESTClient(object):
         :return:
         """
         data = {
-            "url": url,
-            "owner": self.api_url + "organisations/id/" + owner,
-            "priority": 10
+            "urn": urn,
+            "urls": [
+                {
+                    "url": url,
+                    "priority": 10
+                }
+            ]
         }
+        return self.post_urn(data)
 
-        return self.post_urn(urn, data)
+    def check_if_registered(self, urn):
+        """Check if a URN is registered."""
+        return self.head_urn(urn)
 
     def create_successor(self, urn, successor):
+        """Set a successor urn."""
         data = {"successor": self.api_url + "urns/urn/" + successor}
 
         return self.patch_urn(urn, data)
