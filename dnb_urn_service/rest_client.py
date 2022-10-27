@@ -17,6 +17,7 @@ https://wiki.dnb.de/display/URNSERVDOK/URN-Service+API.
 import json
 
 import requests
+from idutils import normalize_urn
 
 from .errors import DNBURNServiceError, DNBURNServiceUserNotAuthorizedError
 from .request import DNBUrnServiceRequest
@@ -88,7 +89,7 @@ class DNBUrnServiceRESTClient(object):
         request = self._create_request()
         resp = request.head("urns/urn/" + urn)
         if resp.status_code == HTTP_OK:
-            return ""
+            return normalize_urn(urn)
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
@@ -105,7 +106,7 @@ class DNBUrnServiceRESTClient(object):
             body=json.dumps(body),
             headers=headers)
         if resp.status_code == HTTP_CREATED:
-            return resp.json()['urn']
+            return normalize_urn(resp.json()['urn'])
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
