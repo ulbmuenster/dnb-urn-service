@@ -124,6 +124,20 @@ class DNBUrnServiceRESTClient(object):
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
 
+    def patch_urls(self, urn, data):
+        """Patch a new JSON payload to patch the URL's at DNB."""
+        headers = {"content-type": "application/json"}
+        body = data
+        request = self._create_request()
+        resp = request.patch(
+            "urns/urn/" + urn + "/my-urls",
+            body=json.dumps(body),
+            headers=headers)
+        if resp.status_code == HTTP_NO_CONTENT:
+            return ""
+        else:
+            raise DNBURNServiceError.factory(resp.status_code, resp.text)
+
     def delete_urn(self, urn):
         """Delete a URN completely.
 
@@ -139,7 +153,6 @@ class DNBUrnServiceRESTClient(object):
         If urn is not provided, there will be an error.
         :param url: URL where the urn will resolve.
         :param urn: URN (e.g. urn:nbn:de:hbz:6-1234)
-        :param owner: ID of the owning organisation, obtained from DNB
         :return:
         """
         data = {
@@ -152,6 +165,25 @@ class DNBUrnServiceRESTClient(object):
             ]
         }
         return self.post_urn(data)
+
+    def modify_urn(self, url, urn):
+        """Modify the url of an existing urn.
+
+        This URN will be public and can be deleted.
+        If urn is not provided, there will be an error.
+        :param url: URL where the urn will resolve.
+        :param urn: URN (e.g. urn:nbn:de:hbz:6-1234)
+        :return:
+        """
+        data = {
+            [
+                {
+                    "url": url,
+                    "priority": 10
+                }
+            ]
+        }
+        return self.patch_urls(urn, data)
 
     def check_if_registered(self, urn):
         """Check if a URN is registered."""
