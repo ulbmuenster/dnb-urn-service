@@ -169,7 +169,7 @@ class DNBUrnServiceRESTClient(object):
     def modify_urn(self, url, urn):
         """Modify the url of an existing urn.
 
-        This URN will be public and can be deleted.
+        This URN will be public and can't be deleted.
         If urn is not provided, there will be an error.
         :param url: URL where the urn will resolve.
         :param urn: URN (e.g. urn:nbn:de:hbz:6-1234)
