@@ -42,9 +42,9 @@ class DNBUrnServiceRESTClient(object):
         :param timeout: Connect and read timeout in seconds. Specify a tuple
             (connect, read) to specify each timeout individually.
         """
-        self.username = username
-        self.password = password
-        self.prefix = prefix
+        self.username = str(username)
+        self.password = str(password)
+        self.prefix = str(prefix)
 
         if test_mode:
             self.api_url = "https://api.nbn-resolving.org/sandbox/v2/"
@@ -92,6 +92,20 @@ class DNBUrnServiceRESTClient(object):
             return normalize_urn(urn)
         else:
             raise DNBURNServiceError.factory(resp.status_code, resp.text)
+
+    def check_urn(self, urn):
+        """Check urn structure.
+        Check that the urn has a form
+        urn:nbn: with the prefix defined
+        """
+        split = urn.split('-')
+        prefix = split[0] + '-'
+        if not urn.startswith(self.prefix):
+            # Provided a URN with the wrong prefix
+            raise ValueError('Wrong URN {0} prefix provided, it should be '
+                             '{1} as defined in the rest client'
+                             .format(prefix, self.prefix))
+        return normalize_urn(urn)
 
     def post_urn(self, data):
         """Post a new JSON payload to DNB."""
