@@ -12,6 +12,7 @@
 """Python API wrapper for the DNB URN service API."""
 
 from .rest_client import DNBUrnServiceRESTClient
-from .version import __version__
 
-__all__ = ('DNBUrnServiceRESTClient', '__version__')
+__version__ = "0.1.5"
+
+__all__ = ("__version__", "DNBUrnServiceRESTClient")
